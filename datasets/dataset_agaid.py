@@ -219,7 +219,7 @@ def get_dataloader(filename='ColdHardiness_Grape_Merlot_2.csv', batch_size=16, m
         test_loader = DataLoader(test_dataset, batch_size=len(test_dataset))
     return train_loader, test_loader, mean, std
 
-def get_testloader(filename='ColdHardiness_Grape_Merlot_2.csv', missing_ratio=0.2, seed=10, season_idx=None, exclude_features=None, length=100, forward_trial=-1, lte_idx=None, random_trial=False, forecastig=False):
+def get_testloader(filename='data/AgAid/ColdHardiness_Grape_Merlot_2.csv', missing_ratio=0.2, seed=10, season_idx=None, exclude_features=None, length=100, forward_trial=-1, lte_idx=None, random_trial=False, forecastig=False):
     np.random.seed(seed=seed)
     df = pd.read_csv(filename)
     modified_df, dormant_seasons = preprocess_missing_values(df, features, is_dormant=True)
