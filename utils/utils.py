@@ -564,7 +564,7 @@ def evaluate_imputation_all(models, mse_folder, dataset_name='', batch_size=16, 
             brits_trials = [results_trials_mse['brits'][i] for i in results_trials_mse['brits'].keys()]
             brits_trials = (z * np.std(brits_trials)) / math.sqrt(len(brits_trials))
 
-        print(f"MSE loss:\n\tCSDI: {results_mse['csdi']} ({csdi_trials})\n\SADI: {results_mse['sadi']} \
+        print(f"MSE loss:\n\tCSDI: {results_mse['csdi']} ({csdi_trials})\n\tSADI: {results_mse['sadi']} \
               ({sadi_trials})\n\tSAITS: {results_mse['saits']} ({saits_trials})\n\tKNN: {results_mse['knn']} ({knn_trials}) \
                     \n\tMICE: {results_mse['mice']} ({mice_trials})\n\tBRITS: {results_mse['brits']} ({brits_trials})")
 

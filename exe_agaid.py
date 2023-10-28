@@ -56,7 +56,7 @@ partial_bm_config['length_range'] = (30,30)
 mse_folder = f"results_agaid_{partial_bm_config['features']}/metric"
 data_folder = f"results_agaid_{partial_bm_config['features']}/data"
 
-for i in partial_bm_config:
+for i in features_test:
     partial_bm_config['features'] = i
     evaluate_imputation_all(models=models, trials=20, mse_folder=mse_folder, dataset_name='agaid', batch_size=16, test_indices=[32,33], mean=mean, std=std, partial_bm_config=partial_bm_config)
 
