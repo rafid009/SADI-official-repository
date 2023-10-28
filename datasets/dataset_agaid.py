@@ -244,7 +244,7 @@ def get_forward_testloader(X, mean, std, forward_trial=-1, lte_idx=None):
     test_loader = DataLoader(test_dataset, batch_size=1)
     return test_loader
 
-def get_testloader_agaid(filename='ColdHardiness_Grape_Merlot_2.csv', batch_size=16, missing_ratio=0.2, seed=10, exclude_features=None, length=100, forward_trial=-1, random_trial=False, forecastig=False, mean=None, std=None, test_idx=-1, pattern=None, partial_bm_config=None):
+def get_testloader_agaid(filename='data/AgAid/ColdHardiness_Grape_Merlot_2.csv', batch_size=16, missing_ratio=0.2, seed=10, exclude_features=None, length=100, forward_trial=-1, random_trial=False, forecastig=False, mean=None, std=None, test_idx=-1, pattern=None, partial_bm_config=None):
     np.random.seed(seed=seed)
     df = pd.read_csv(filename)
     modified_df, dormant_seasons = preprocess_missing_values(df, features, is_dormant=True)

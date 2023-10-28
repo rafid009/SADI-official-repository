@@ -35,14 +35,14 @@ print(config)
 model_SADI = SADI_Agaid(config, device, is_simple=False).to(device)
 filename = f'model_sadi_agaid.pth'
 model_folder = "saved_model_agaid"
-train(
-    model_SADI,
-    config["train"],
-    train_loader,
-    valid_loader=valid_loader,
-    foldername=model_folder,
-    filename=f"{filename}"
-)
+# train(
+#     model_SADI,
+#     config["train"],
+#     train_loader,
+#     valid_loader=valid_loader,
+#     foldername=model_folder,
+#     filename=f"{filename}"
+# )
 nsample = 50
 model_SADI.load_state_dict(torch.load(f"{model_folder}/{filename}"))
 print(f"SADI params: {get_num_params(model_SADI)}")
