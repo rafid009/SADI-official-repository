@@ -125,14 +125,13 @@ def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldernam
 
         all_target = []
         all_observed_point = []
-        all_observed_time = []
         all_evalpoint = []
         all_generated_samples = []
         with tqdm(test_loader, mininterval=5.0, maxinterval=50.0) as it:
             for batch_no, test_batch in enumerate(it, start=1):
                 output = model.evaluate(test_batch, nsample)
 
-                samples, c_target, eval_points, observed_points, observed_time, _, _ = output
+                samples, c_target, eval_points, observed_points, _, _ = output
                 samples = samples.permute(0, 1, 3, 2)  # (B,nsample,L,K)
                 c_target = c_target.permute(0, 2, 1)  # (B,L,K)
                 eval_points = eval_points.permute(0, 2, 1)
@@ -142,7 +141,6 @@ def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldernam
                 all_target.append(c_target)
                 all_evalpoint.append(eval_points)
                 all_observed_point.append(observed_points)
-                all_observed_time.append(observed_time)
                 all_generated_samples.append(samples)
 
                 mse_current = (
@@ -171,7 +169,6 @@ def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldernam
                 all_target = torch.cat(all_target, dim=0)
                 all_evalpoint = torch.cat(all_evalpoint, dim=0)
                 all_observed_point = torch.cat(all_observed_point, dim=0)
-                all_observed_time = torch.cat(all_observed_time, dim=0)
                 all_generated_samples = torch.cat(all_generated_samples, dim=0)
 
                 pickle.dump(
@@ -180,7 +177,6 @@ def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldernam
                         all_target,
                         all_evalpoint,
                         all_observed_point,
-                        all_observed_time,
                         scaler,
                         mean_scaler,
                     ],
@@ -290,7 +286,7 @@ def evaluate_imputation_all(models, mse_folder, dataset_name='', batch_size=16, 
             if 'SADI' in models.keys():
                 output_sadi = models['SADI'].evaluate(test_batch, nsample)
                 if 'CSDI' not in models.keys():
-                    samples_sadi, c_target, eval_points, observed_points, observed_time, obs_intact, gt_intact = output_sadi
+                    samples_sadi, c_target, eval_points, observed_points, obs_intact, gt_intact = output_sadi
                     c_target = c_target.permute(0, 2, 1)  # (B,L,K)
                     eval_points = eval_points.permute(0, 2, 1)
                     observed_points = observed_points.permute(0, 2, 1)

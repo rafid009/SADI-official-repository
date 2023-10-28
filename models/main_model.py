@@ -188,7 +188,6 @@ class SADI_base(nn.Module):
 
                 _, _, predicted = self.diffmodel(inputs, torch.tensor([t]).to(self.device))              
                 
-
                 if self.is_fast:
                     prdicted_x0 = (current_sample - ((1 - self.alpha[t]) ** 0.5) * predicted) / (self.alpha[t] ** 0.5)
                     current_sample = (self.alpha[t-1] ** 0.5) * prdicted_x0 + ((1 - self.alpha[t-1]) ** 0.5) * predicted
@@ -214,24 +213,12 @@ class SADI_base(nn.Module):
         (
             observed_data,
             observed_mask,
-            observed_tp,
             gt_mask,
             for_pattern_mask,
             _, _, _
         ) = self.process_data(batch)
         if is_train == 0:
-            if self.target_strategy.startswith('pattern'):
-                cond_mask = self.get_pattern_mask(observed_mask, is_val=True)
-            else:
-                cond_mask = gt_mask
-        elif self.target_strategy == 'pattern-random':
-            mask_choice = np.random.rand()
-            if mask_choice > 0.5:
-                cond_mask = self.get_pattern_mask(observed_mask)
-            else:
-                cond_mask = self.get_randmask(observed_mask)
-        elif self.target_strategy == 'pattern':
-            cond_mask = self.get_pattern_mask(observed_mask)
+            cond_mask = gt_mask
         elif self.target_strategy == "mix":
             cond_mask = self.get_hist_mask(
                 observed_mask, for_pattern_mask=for_pattern_mask
@@ -250,7 +237,6 @@ class SADI_base(nn.Module):
         (
             observed_data,
             observed_mask,
-            observed_tp,
             gt_mask,
             _,
             cut_length,
@@ -266,7 +252,7 @@ class SADI_base(nn.Module):
             for i in range(len(cut_length)):
                 target_mask[i, ..., 0 : cut_length[i].item()] = 0
        
-        return samples, observed_data, target_mask, observed_mask, observed_tp, obs_data_inact, gt_intact
+        return samples, observed_data, target_mask, observed_mask, obs_data_inact, gt_intact
 
 
 class SADI_Agaid(SADI_base):
@@ -276,7 +262,6 @@ class SADI_Agaid(SADI_base):
     def process_data(self, batch):
         observed_data = batch["observed_data"].to(self.device).float()
         observed_mask = batch["observed_mask"].to(self.device).float()
-        observed_tp = batch["timepoints"].to(self.device).float()
         gt_mask = batch["gt_mask"].to(self.device).float()
         observed_data_intact = batch["obs_data_intact"].to(self.device).float()
         gt_intact = batch["gt_intact"]#.to(self.device).float()
@@ -290,7 +275,6 @@ class SADI_Agaid(SADI_base):
         return (
             observed_data,
             observed_mask,
-            observed_tp,
             gt_mask,
             for_pattern_mask,
             cut_length,
@@ -305,7 +289,6 @@ class SADI_Synth(SADI_base):
     def process_data(self, batch):
         observed_data = batch["observed_data"].to(self.device).float()
         observed_mask = batch["observed_mask"].to(self.device).float()
-        observed_tp = batch["timepoints"].to(self.device).float()
         gt_mask = batch["gt_mask"].to(self.device).float()
         observed_data_intact = batch["obs_data_intact"].to(self.device).float()
         gt_intact = batch["gt_intact"]#.to(self.device).float()
@@ -320,7 +303,6 @@ class SADI_Synth(SADI_base):
         return (
             observed_data,
             observed_mask,
-            observed_tp,
             gt_mask,
             for_pattern_mask,
             cut_length,
