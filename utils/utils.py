@@ -34,6 +34,8 @@ def train(
 ):
     optimizer = Adam(model.parameters(), lr=config["lr"], weight_decay=1e-6)
     if foldername != "":
+        if not os.path.isdir(foldername):
+            os.makedirs(foldername)
         output_path = foldername + f"/{filename if len(filename) != 0 else 'model_sadi.pth'}"
 
     p1 = int(0.75 * config["epochs"])
