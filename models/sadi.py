@@ -3,11 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 from utils.transformer import EncoderLayer, PositionalEncoding
-from pypots.imputation import SAITS
-import numpy as np
-# torch.manual_seed(42)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def Conv1d_with_init(in_channels, out_channels, kernel_size):
@@ -54,17 +51,6 @@ class DiffusionEmbedding(nn.Module):
         table = steps * frequencies  # (T,dim)
         table = torch.cat([torch.sin(table), torch.cos(table)], dim=1)  # (T,dim*2)
         return table
-
-
-
-
-
-############################### New Design ################################
-
-# def swish(x):
-#     return x * torch.sigmoid(x)
-
-
     
 
 def Conv1d_with_init_saits_new(in_channels, out_channels, kernel_size, init_zero=False, dilation=1):
@@ -76,14 +62,6 @@ def Conv1d_with_init_saits_new(in_channels, out_channels, kernel_size, init_zero
     else:
         nn.init.kaiming_normal_(layer.weight)
     return layer
-    
-
-
-# def conv_with_init(in_channels, out_channel, kernel_size):
-#     layer = nn.Conv2d(in_channels, out_channel, kernel_size, stride=2)
-#     nn.init.kaiming_normal_(layer.weight)
-#     return layer
-
 
 
 class GTA(nn.Module):
@@ -109,14 +87,7 @@ class GTA(nn.Module):
         self.res_proj = Conv1d_with_init_saits_new(channels, d_model, 1)
         self.skip_proj = Conv1d_with_init_saits_new(channels, d_model, 1)
 
-        # self.output_proj = Conv1d_with_init_saits_new(channels, 2 * d_model, 1)
-        
-        # self.norm = nn.LayerNorm([d_time, d_model])
-        # self.post_enc_proj = Conv1d_with_init(channels, 4, 1)
 
-
-
-    # new_design
     def forward(self, x, cond, diffusion_emb):
         # x Noise
         # L -> time

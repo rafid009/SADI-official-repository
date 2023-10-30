@@ -1,8 +1,12 @@
+"""
+Some parts of the code is from https://github.com/ermongroup/CSDI.
+"""
+
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from models.diff_models import SADI
+from models.sadi import SADI
 from datasets.process_data import features
 import math
 from sklearn.experimental import enable_iterative_imputer
@@ -14,21 +18,12 @@ class SADI_base(nn.Module):
         self.device = device
         self.target_dim = target_dim
 
-        self.emb_time_dim = config["model"]["timeemb"]
-        self.emb_feature_dim = config["model"]["featureemb"]
-        self.is_unconditional = config["model"]["is_unconditional"]
         self.target_strategy = config["model"]["target_strategy"]
         self.model_type = config["model"]["type"]
         self.is_simple = is_simple
         self.is_fast = config["diffusion"]['is_fast']
         ablation_config = config['ablation']
 
-        self.emb_total_dim = self.emb_time_dim + self.emb_feature_dim
-        if self.is_unconditional == False:
-            self.emb_total_dim += 1  # for conditional mask
-        self.embed_layer = nn.Embedding(
-            num_embeddings=self.target_dim, embedding_dim=self.emb_feature_dim
-        )
 
         config_diff = config["diffusion"]
         config_diff["side_dim"] = self.emb_total_dim
