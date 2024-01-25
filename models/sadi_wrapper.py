@@ -7,7 +7,6 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from models.sadi import SADI
-from datasets.process_data import features
 import math
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
@@ -251,7 +250,7 @@ class SADI_base(nn.Module):
 
 
 class SADI_Agaid(SADI_base):
-    def __init__(self, config, device, target_dim=len(features), is_simple=False):
+    def __init__(self, config, device, target_dim=21, is_simple=False):
         super(SADI_Agaid, self).__init__(target_dim, config, device, is_simple=is_simple)
 
     def process_data(self, batch):
