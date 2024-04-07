@@ -24,8 +24,11 @@ class ScaledDotProductAttention(nn.Module):
         output = torch.matmul(attn, v)
         return output, attn
 
-def Conv1d_with_init(in_channels, out_channels, kernel_size=1, bias=True, init_zero=False):
-    layer = nn.Conv1d(in_channels, out_channels, kernel_size, bias=bias)
+def Conv1d_with_init(in_channels, out_channels, kernel_size=1, bias=True, init_zero=False, dilation=1):
+    
+    padding = dilation * ((kernel_size - 1)//2)
+    layer = nn.Conv1d(in_channels, out_channels, kernel_size, padding=padding, bias=bias, dilation=dilation)
+
     if init_zero:
         nn.init.zeros_(layer.weight)
     else:
@@ -35,7 +38,7 @@ def Conv1d_with_init(in_channels, out_channels, kernel_size=1, bias=True, init_z
 class MultiHeadAttention(nn.Module):
     """original Transformer multi-head attention"""
 
-    def __init__(self, n_head, d_model, d_k, d_v, attn_dropout, choice='linear', d_channel=-1, is_linear=False):
+    def __init__(self, n_head, d_model, d_k, d_v, attn_dropout, choice='linear', d_channel=-1, is_linear=False, dilation=1):
         super().__init__()
         self.n_head = n_head
         self.d_k = d_k
@@ -45,9 +48,9 @@ class MultiHeadAttention(nn.Module):
         self.is_linear = is_linear
         if self.choice == 'fde-conv-single' or self.choice == 'fde-conv-multi':
             if not self.is_linear:
-                self.w_qs = Conv1d_with_init(d_channel, d_channel, kernel_size=1, bias=False)
-                self.w_ks = Conv1d_with_init(d_channel, d_channel, kernel_size=1, bias=False)
-                self.w_vs = Conv1d_with_init(d_channel, d_channel, kernel_size=1, bias=False)
+                self.w_qs = Conv1d_with_init(d_channel, d_channel, kernel_size=3, bias=False, dilation=dilation)
+                self.w_ks = Conv1d_with_init(d_channel, d_channel, kernel_size=3, bias=False, dilation=dilation)
+                self.w_vs = Conv1d_with_init(d_channel, d_channel, kernel_size=3, bias=False, dilation=dilation)
                 if self.choice == 'fde-conv-multi':
                     self.w_q_head = Conv1d_with_init(1, self.n_head, kernel_size=1, bias=False)
                     self.w_k_head = Conv1d_with_init(1, self.n_head, kernel_size=1, bias=False)
@@ -134,7 +137,7 @@ class PositionWiseFeedForward(nn.Module):
 
 class EncoderLayer(nn.Module):
     def __init__(self, d_time, d_feature, d_model, d_inner, n_head, d_k, d_v, dropout=0.1, attn_dropout=0.1,
-                 diagonal_attention_mask=False, choice='linear', is_ffn=True, is_linear=False):
+                 diagonal_attention_mask=False, choice='linear', is_ffn=True, is_linear=False, dilation=1):
         super().__init__()
 
         self.diagonal_attention_mask = diagonal_attention_mask
@@ -142,7 +145,7 @@ class EncoderLayer(nn.Module):
         self.d_feature = d_feature
 
         self.layer_norm = nn.LayerNorm(d_model)
-        self.slf_attn = MultiHeadAttention(n_head, d_model, d_k, d_v, attn_dropout, choice=choice, d_channel=d_time, is_linear=is_linear)
+        self.slf_attn = MultiHeadAttention(n_head, d_model, d_k, d_v, attn_dropout, choice=choice, d_channel=d_time, is_linear=is_linear, dilation=dilation)
         self.dropout = nn.Dropout(dropout)
         self.is_ffn = is_ffn
         if self.is_ffn:

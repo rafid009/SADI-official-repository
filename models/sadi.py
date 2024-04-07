@@ -193,13 +193,13 @@ class SADI(nn.Module):
             if not self.ablation_config['is-fde-linear']:
                 self.layer_stack_for_feature_weights = nn.ModuleList([
                     EncoderLayer(d_feature, d_time, d_time, d_inner, n_head, d_time, d_time, dropout, 0,
-                                self.ablation_config['fde-diagonal'], choice='fde-conv-multi')
+                                self.ablation_config['fde-diagonal'], choice='fde-conv-multi', dilation=1)
                     for _ in range(self.ablation_config['fde-layers'])
                 ])
             else:
                 self.layer_stack_for_feature_weights = nn.ModuleList([
                     EncoderLayer(d_feature, d_time, d_time, d_inner, n_head, 64, 64, dropout, 0,
-                                self.ablation_config['fde-diagonal'], choice='fde-conv-multi', is_linear=True)
+                                self.ablation_config['fde-diagonal'], choice='fde-conv-multi', is_linear=True, dilation=1)
                     for _ in range(self.ablation_config['fde-layers'])
                 ])
             if self.ablation_config['fde-pos-enc']:
